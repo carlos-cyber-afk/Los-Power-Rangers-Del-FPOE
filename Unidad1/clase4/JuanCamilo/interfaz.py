@@ -1,6 +1,6 @@
 import tkinter as tk
 import tkinter.messagebox as messagebox
-from Unidad1.JuanCamiloArenasGuiterrez.clase4.uva import Uva
+from uva import Uva
 
 class Interfaz():
 

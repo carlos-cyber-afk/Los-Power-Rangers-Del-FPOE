@@ -4,38 +4,47 @@ from datetime import datetime
 import tkinter.messagebox as messagebox
 from uva import Uva
 
+
+import tkinter as tk
+import re
+import tkinter.messagebox as messagebox
+from uva import Uva
+
+
+
 class Interfaz():
 
     def __init__(self):
 
         self.ventana_principal = tk.Tk()
         self.uva = Uva(self.ventana_principal)
-        self.uva.peso = tk.StringVar(value="") # Para que el peso sea un StringVar y pueda ser validado como texto
+        self.uva.peso = tk.StringVar(value="") 
 
     def validar_textura(self, valor):
+
         valor = valor.strip()
         if valor == "":
             return "no puede estar vacío"
         if len(valor) > 50:
-                    return "Máximo 50 caracteres"
-        patron = re.compile(r"^[A-Za-z0-9ñÑáéíóúÁÉÍÓÚüÜ .,:;¿?¡!'\-]+$")
+            return "Máximo 50 caracteres"
+        patron = re.compile(r"^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s]+$")
         if patron.match(valor) is None:
-           return "Hay caracteres no permitidos"
-        return ""   
-
+            return "solo se permiten letras"
+        return ""
+    
     def validar_forma(self, valor):
             valor = valor.strip()
             if valor == "":
                 return "no puede estar vacío"
             if len(valor) > 50:
-                        return "Máximo 50 caracteres"
-            patron = re.compile(r"^[A-Za-z0-9ñÑáéíóúÁÉÍÓÚüÜ .,:;¿?¡!'\-]+$")
+                return "Máximo 50 caracteres"
+            patron = re.compile(r"^[A-Za-zñÑáéíóúÁÉÍÓÚüÜ\s]+$")
             if patron.match(valor) is None:
-               return "Hay caracteres no permitidos"
+               return "solo se permiten letras"
             return ""  
      
     def validar_peso(self, valor):
-      valqor = valor.strip()
+      valor = valor.strip()
       if valor == "":
           return "no puede estar vacío"
       try:
@@ -43,7 +52,7 @@ class Interfaz():
             if valor_float <= 0:
                 return "Debe ser un número positivo"
       except ValueError:
-            return "Debe ser un número decimal"
+            return "Debe ser un números"
       return ""
 
     def evento_textura(self, evento=None):
@@ -73,11 +82,12 @@ class Interfaz():
              
              
             messagebox.showinfo(
-            "guardar", 
-             f"Guardando: Textura: {self.uva.textura.get().strip()}," 
-             f"Peso:{self.uva.peso.get().strip()} gr,"
-             f"Forma: {self.uva.forma.get().strip()},"
-             f"Tamaño : {self.uva.tamaño.get()}")
+                "guardar", 
+               f"Guardando:\n"
+               f"Textura: {self.uva.textura.get().strip()}\n" 
+               f"Peso:{self.uva.peso.get().strip()} gr\n"
+               f"Forma: {self.uva.forma.get().strip()}\n"
+               f"Tamaño : {self.uva.tamaño.get()}")
 
 
     def mostrar_interfaz(self):
@@ -102,10 +112,19 @@ class Interfaz():
         scale_tamaño = tk.Scale(self.ventana_principal, from_=1, to=10, orient="horizontal", variable=uva.tamaño)
 
 
-        boton_guardar = tk.Button(self.ventana_principal, text="Guardar", command=lambda: self.accion_guardar_boton(self.entry_textura.get().strip(), self.entry_peso.get().strip(), self.entry_forma.get().strip(), self.scale_tamaño.get()))
+        boton_guardar = tk.Button(
+            self.ventana_principal,
+            text="Guardar",
+            command=self.accion_guardar_boton
+        )
 
+        entry_textura.bind("<KeyRelease>", self.evento_textura)
         entry_textura.bind("<FocusOut>", self.evento_textura)
-        entry_peso.bind("<FocusOut>", self.evento_peso) 
+
+        entry_peso.bind("<KeyRelease>", self.evento_peso)
+        entry_peso.bind("<FocusOut>", self.evento_peso)
+
+        entry_forma.bind("<KeyRelease>", self.evento_forma)
         entry_forma.bind("<FocusOut>", self.evento_forma)
 
         self.ventana_principal.title("Ventana Principal")
@@ -121,7 +140,8 @@ class Interfaz():
         self.labelErrorForma.pack()
         label_tamaño.pack()
         scale_tamaño.pack()
-        boton_guardar.pack()
+        boton_guardar.pack(pady=15)
 
         self.ventana_principal.mainloop()
+        
 

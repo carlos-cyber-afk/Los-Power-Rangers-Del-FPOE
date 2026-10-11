@@ -8,4 +8,4 @@ class Uva():
         self.textura = tk.StringVar(ventana_principal)
         self.forma = tk.StringVar(ventana_principal)
         self.tamaño = tk.IntVar(ventana_principal)
-        self.peso = tk.DoubleVar(ventana_principal)
+        self.peso = tk.StringVar(ventana_principal)

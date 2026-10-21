@@ -33,16 +33,16 @@ class Interfaz():
         return ""  
      
     def validar_peso(self, valor):
-        valor = valor.strip()
-        if valor == "":
-            return "no puede estar vacío"
-        try:
-            valor_float = float(valor)
-            if valor_float <= 0:
-                return "Debe ser un número positivo"
-        except ValueError:
-            return "Debe ser un número"
-        return ""
+            valor = valor.strip()
+            if valor == "":
+                return "no puede estar vacío"
+            try:
+                valor_float = float(valor)
+                if valor_float <= 0:
+                    return "Debe ser un número positivo"
+            except ValueError:
+                return "Debe ser un número"
+            return ""
 
     def evento_textura(self, evento=None):
         mensaje = self.validar_textura(self.uva.textura.get())

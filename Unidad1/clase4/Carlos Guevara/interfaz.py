@@ -11,6 +11,7 @@ class Interfaz:
         self.ventanaPrincipal = tk.Tk()
         self.libro = Libro(self.ventanaPrincipal)
 
+    # VALIDACIONES
     def validar_titulo(self, valor):
         valor = valor.strip()
         if valor == "":
@@ -43,6 +44,7 @@ class Interfaz:
             return "La fecha no puede ser futura"
         return ""
 
+    # EVENTOS
     def evento_titulo(self, evento=None):
         mensaje = self.validar_titulo(self.libro.titulo.get())
         self.labelErrorTitulo.config(text=mensaje)

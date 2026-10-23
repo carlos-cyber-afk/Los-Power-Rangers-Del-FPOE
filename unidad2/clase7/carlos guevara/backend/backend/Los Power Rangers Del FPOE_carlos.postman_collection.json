@@ -1,0 +1,66 @@
+{
+  "info": {
+    "_postman_id": "ae589d67-cf35-40d3-a15a-8c5284f4c053",
+    "name": "Los Power Rangers Del FPOE_carlos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57892496",
+    "_collection_link": "https://go.postman.co/collection/57892496-ae589d67-cf35-40d3-a15a-8c5284f4c053?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "traer todos los datos",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "traer un dato",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "guardar un dato",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "editar un dato",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "borrar un dato",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
+    }
+  ]
+}

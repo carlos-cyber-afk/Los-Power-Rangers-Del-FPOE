@@ -1,0 +1,209 @@
+{
+  "info": {
+    "_postman_id": "744d3317-7c1e-45ab-a719-f105b9bd2350",
+    "name": "Biblioteca",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57892496",
+    "_collection_link": "https://go.postman.co/collection/57892496-744d3317-7c1e-45ab-a719-f105b9bd2350?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "crear",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Cien años de soledad\",\n  \"paginas\": 471,\n  \"fecha_publicacion\": \"1967-05-30\",\n  \"disponible\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/libros/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "libros",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "listar",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Cien años de soledad\",\n  \"paginas\": 471,\n  \"fecha_publicacion\": \"1967-05-30\",\n  \"disponible\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/libros/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "libros",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "consultar",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Cien años de soledad\",\n  \"paginas\": 471,\n  \"fecha_publicacion\": \"1967-05-30\",\n  \"disponible\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/libros/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "libros",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "remplazar",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Cien años de soledad\",\n  \"paginas\": 471,\n  \"fecha_publicacion\": \"1967-05-30\",\n  \"disponible\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/libros/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "libros",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "modificar",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Cien años de soledad\",\n  \"paginas\": 471,\n  \"fecha_publicacion\": \"1967-05-30\",\n  \"disponible\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/libros/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "libros",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "eliminar",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"titulo\": \"Cien años de soledad\",\n  \"paginas\": 471,\n  \"fecha_publicacion\": \"1967-05-30\",\n  \"disponible\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/libros/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "libros",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

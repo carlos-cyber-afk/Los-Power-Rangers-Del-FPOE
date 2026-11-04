@@ -10,7 +10,7 @@ class LibroSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "titulo": {"label": "Título", "help_text": "Obligatorio. Máximo 150 caracteres."},
             "paginas": {"label": "Páginas", "help_text": "Número entero mayor que cero."},
-            "fecha_publicacion": {"label": "Fecha de publicación", "help_text": "Formato AAAA-MM-DD. Ejemplo: 2020-05-14"},
+            "fecha_publicacion": {"label": "Fecha de publicación", "help_text": "Formato AAAA-MM-DD. Ejemplo: 14-05-2020"},
             "disponible": {"label": "Disponible"},
         }
 

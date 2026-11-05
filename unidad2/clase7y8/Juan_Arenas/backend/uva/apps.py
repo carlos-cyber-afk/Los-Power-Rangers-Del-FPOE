@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class UvaConfig(AppConfig):
-    name = 'uva'
+class InventarioConfig(AppConfig):
+    name = "inventario"

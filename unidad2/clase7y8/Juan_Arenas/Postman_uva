@@ -1,79 +1,20 @@
 {
   "info": {
-    "_postman_id": "ca7448c1-c34e-4235-a88b-01d4688b77c1",
+    "_postman_id": "66fa2500-f821-407a-ab2e-8a83d0c9a611",
     "name": "New Collection",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "59125700",
-    "_collection_link": "https://go.postman.co/collection/59125700-ca7448c1-c34e-4235-a88b-01d4688b77c1?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/59125700-66fa2500-f821-407a-ab2e-8a83d0c9a611?source=collection_link"
   },
   "item": [
     {
-      "name": "Traer todos los Datos",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8000/asignaturas/",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8000",
-          "path": [
-            "asignaturas",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Traer un Dato",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8000/asignaturas/1/",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8000",
-          "path": [
-            "asignaturas",
-            "1",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Guardar Dato",
+      "name": "Crear dato",
       "request": {
         "method": "POST",
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"id\": 1,\r\n    \"nombre\": \"Matematicas\",\r\n    \"creditos\": 5,\r\n    \"activa\": true,\r\n    \"fecha_inicio\": \"2026-10-14\",\r\n    \"total_clases\": 0,\r\n    \"clases\": []\r\n}",
+          "raw": "{\r\n    \"id\": 1,\r\n    \"peso\": 12.5,\r\n    \"tamano\": 8,\r\n    \"forma\": \"Redonda\",\r\n    \"textura\": \"crujiente\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -81,14 +22,18 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8000/asignaturas/",
+          "raw": "http://127.0.0.1:8000/api/uvas/",
           "protocol": "http",
           "host": [
-            "localhost"
+            "127",
+            "0",
+            "0",
+            "1"
           ],
           "port": "8000",
           "path": [
-            "asignaturas",
+            "api",
+            "uvas",
             ""
           ]
         }
@@ -96,39 +41,9 @@
       "response": []
     },
     {
-      "name": "Editar Dato",
+      "name": "trear todos los datos",
       "request": {
-        "method": "PUT",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"id\": 1,\r\n    \"nombre\": \"Japones\",\r\n    \"creditos\": 5,\r\n    \"activa\": true,\r\n    \"fecha_inicio\": \"2026-10-14\",\r\n    \"total_clases\": 0,\r\n    \"clases\": []\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "http://localhost:8000/asignaturas/1/",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8000",
-          "path": [
-            "asignaturas",
-            "1",
-            ""
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Borrar Dato",
-      "request": {
-        "method": "DELETE",
+        "method": "GET",
         "header": [],
         "body": {
           "mode": "raw",
@@ -140,15 +55,145 @@
           }
         },
         "url": {
-          "raw": "http://localhost:8000/asignaturas/1/",
+          "raw": "http://127.0.0.1:8000/api/uvas/",
           "protocol": "http",
           "host": [
-            "localhost"
+            "127",
+            "0",
+            "0",
+            "1"
           ],
           "port": "8000",
           "path": [
-            "asignaturas",
-            "1",
+            "api",
+            "uvas",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "trear un dato",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/uvas/7/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "uvas",
+            "7",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "remplazar dato",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": 7,\r\n    \"peso\": 12.5,\r\n    \"tamano\": 8,\r\n    \"forma\": \"Redonda\",\r\n    \"textura\": \"suave\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/uvas/7/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "uvas",
+            "7",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Modificar dato",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": 7,\r\n    \"peso\": 11.5,\r\n    \"tamano\": 8,\r\n    \"forma\": \"Redonda\",\r\n    \"textura\": \"suave\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/uvas/7/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "uvas",
+            "7",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "eliminar dato",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/uvas/7/",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "uvas",
+            "7",
             ""
           ]
         }

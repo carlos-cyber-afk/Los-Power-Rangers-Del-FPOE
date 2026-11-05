@@ -16,20 +16,12 @@ from django.db.models import ProtectedError
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from ..models import Categoria
-from ..serializers import CategoriaSerializer
+from ..models import Uva
+from ..serializers import UvaSerializer
 
 
-class CategoriaViewSet(viewsets.ModelViewSet):
-    queryset = Categoria.objects.all()
-    serializer_class = CategoriaSerializer
+class UvaViewSet(viewsets.ModelViewSet):
+    queryset = Uva.objects.all()
+    serializer_class = UvaSerializer
 
-    def destroy(self, request, *args, **kwargs):
-        """DELETE: si la categoría tiene productos, responde 409 Conflict."""
-        try:
-            return super().destroy(request, *args, **kwargs)
-        except ProtectedError:
-            return Response(
-                {"detail": "No se puede eliminar: la categoría tiene productos asociados."},
-                status=status.HTTP_409_CONFLICT,
-            )
+   

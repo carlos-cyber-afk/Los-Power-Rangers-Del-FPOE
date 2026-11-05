@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     # Terceros
     "rest_framework",
     # Apps del proyecto
-    "inventario",
+    "uva",
 ]
 
 MIDDLEWARE = [

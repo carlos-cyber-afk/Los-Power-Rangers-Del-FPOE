@@ -4,10 +4,8 @@ El router de DRF genera automáticamente las URL de cada ViewSet:
 """
 from rest_framework.routers import DefaultRouter
 
-from .views import CategoriaViewSet, ProductoViewSet
+from .views import UvaViewSet
 
 router = DefaultRouter()
-router.register("categorias", CategoriaViewSet)
-router.register("productos", ProductoViewSet)
-
+router.register("uvas", UvaViewSet)
 urlpatterns = router.urls

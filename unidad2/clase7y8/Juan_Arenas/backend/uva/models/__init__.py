@@ -8,7 +8,6 @@ estaban todos en un solo models.py.
 Gracias a este archivo, el resto del proyecto puede seguir escribiendo:
     from inventario.models import Categoria, Producto
 """
-from .categoria import Categoria
-from .producto import Producto
+from .uva import Uva
 
-__all__ = ["Categoria", "Producto"]
+__all__ = ["Uva"]

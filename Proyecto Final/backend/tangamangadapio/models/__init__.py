@@ -10,5 +10,9 @@ Gracias a este archivo, el resto del proyecto puede seguir escribiendo:
 """
 from .categoria import Categoria
 from .producto import Producto
+from .categoria_venta import CategoriaVenta 
+from .venta import Venta
+from .categoria_detalle import Categoria_Detalle
+from .detalle_venta import Detalle_Venta
 
-__all__ = ["Categoria", "Producto"]
+__all__ = ["Categoria", "Producto","CategoriaVenta", "Venta", "Categoria_Detalle", "Detalle_Venta"]

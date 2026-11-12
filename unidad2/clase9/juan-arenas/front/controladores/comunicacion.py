@@ -43,13 +43,13 @@ class Comunicacion():
         return self.peticion('DELETE', '/' + recurso + '/' + str(id) + '/')
 
     def consultarAsignaturas(self):
-        return self.peticion('GET', '/asignatura')
+        return self.peticion('GET', '/uva')
 
     def guardarAsignatura(self, datos, id=None):
-        return self.guardar('asignatura', datos, id)
+        return self.guardar('uva', datos, id)
 
     def eliminarAsignatura(self, id):
-        return self.eliminar('asignatura', id)
+        return self.eliminar('uva', id)
 
     def consultarClases(self):
         return self.peticion('GET', '/clase')

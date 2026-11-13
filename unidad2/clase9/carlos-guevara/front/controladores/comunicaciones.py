@@ -1,42 +1,50 @@
-import request
+import requests
 
-class ErrorComunicaciones(Exception):
-    """Error con un mensaje listo para mostrarle al usuario"""
 
-class Comunicaciones:
+class ErrorComunicacion(Exception):
 
-    def __init__(self):
-        self.url = "https://localhost:8000/"
+    def __init__(self, mensaje, codigo=None):
+        super().__init__(mensaje)
+        self.codigo = codigo
 
-    def peticion(self, metodo, ruta, datos=None):
+
+class Comunicacion:
+
+    def __init__(self, base='http://127.0.0.1:8000/api/'):
+        self.base = base
+
+    def _url(self, recurso, id=None):
+        if id is None:
+            return f'{self.base}{recurso}/'
+        return f'{self.base}{recurso}/{id}/'
+
+    def _enviar(self, metodo, url, **kwargs):
         try:
-            resultado = request.request(metodo, self.url + ruta, json=datos)
-        except request.RequestException:
-            raise ErrorComunicaciones(
-                "Error en la comunicación con el servidor. ¿Está el servidor en ejecución?"
-                )
-        if not resultado.ok:
-            raise ErrorComunicaciones(self._mensaje_error(resultado))
-        return resultado.json() if resultado.content else None
+            respuesta = requests.request(metodo, url, timeout=10, **kwargs)
+        except requests.exceptions.RequestException:
+            raise ErrorComunicacion('No se pudo conectar con el servidor')
 
-    def _mensaje_error(self, resultado):
-        try:
-            return resultado.json()
-        except ValueError:
-            return "el servidor respondió con error" + str(resultado.status_code) + "."
+        if respuesta.status_code >= 400:
+            raise ErrorComunicacion(respuesta.text, respuesta.status_code)
 
-        mensajes = []
+        if respuesta.status_code == 204:
+            return None
+        return respuesta.json()
 
-    for campo, detalle in errores.items():
-        texto = " ".join(detalle) if isinstance(detalle, list) else str(detalle)
-        if campo in ("detail", "non_field_errors"):
-            mensajes.append(texto)
-        else:
-            mensajes.append(campo + ": " + texto)
+    def listar(self, recurso):
+        return self._enviar('GET', self._url(recurso))
 
-    return "\n".join(mensajes)
+    def consultar(self, recurso, id):
+        return self._enviar('GET', self._url(recurso, id))
 
-    def guardar(self, recursos, datos, id=None):
-        if id is not None:
-            return self.peticion("POST", "/" + recursos, datos)
-        return self.peticion("PUT", "/" + recursos + "/" + str(id) + "/", datos)
+    def crear(self, recurso, datos):
+        return self._enviar('POST', self._url(recurso), json=datos)
+
+    def reemplazar(self, recurso, id, datos):
+        return self._enviar('PUT', self._url(recurso, id), json=datos)
+
+    def modificar(self, recurso, id, cambios):
+        return self._enviar('PATCH', self._url(recurso, id), json=cambios)
+
+    def eliminar(self, recurso, id):
+        return self._enviar('DELETE', self._url(recurso, id))

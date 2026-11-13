@@ -1,12 +1,15 @@
 import requests
 
 class ErrorComunicacion(Exception):
+    def __init__(self, mensaje, codigo=None):
+        super().__init__(mensaje)
+        self.codigo = codigo
     """Error con un mensaje listo para mostrarle al usuario."""
 
 class Comunicacion():
 
     def __init__(self):
-        self.url = 'http://localhost:8000/'
+        self.url = 'http://localhost:8000/api/'
 
     def peticion(self, metodo, ruta, datos=None):
         try:
@@ -16,7 +19,7 @@ class Comunicacion():
                 'No se pudo conectar con el servidor. ¿Está corriendo el back?'
             )
         if not resultado.ok:
-            raise ErrorComunicacion(self.mensaje_error(resultado))
+            raise ErrorComunicacion(self.mensaje_error(resultado), resultado.status_code)
         return resultado.json() if resultado.content else None
 
     def mensaje_error(self, resultado):
@@ -34,28 +37,31 @@ class Comunicacion():
                 mensajes.append(campo + ': ' + texto)
         return '\n'.join(mensajes)
 
-    def guardar(self, recurso, datos, id=None):
+    def _ruta(self, recurso, id=None):
+        # DRF exige la barra final: /api/uvas/ y /api/uvas/5/
         if id is None:
-            return self.peticion('POST', '/' + recurso, datos)
-        return self.peticion('PUT', '/' + recurso + '/' + str(id) + '/', datos)
+            return recurso + '/'
+        return recurso + '/' + str(id) + '/'
+
+    def listar(self, recurso):
+        return self.peticion('GET', self._ruta(recurso))
+
+    def consultar(self, recurso, id):
+        return self.peticion('GET', self._ruta(recurso, id))
+
+    def crear(self, recurso, datos):
+        return self.peticion('POST', self._ruta(recurso), datos)
+
+    def reemplazar(self, recurso, id, datos):
+        return self.peticion('PUT', self._ruta(recurso, id), datos)
+
+    def modificar(self, recurso, id, datos):
+        return self.peticion('PATCH', self._ruta(recurso, id), datos)
 
     def eliminar(self, recurso, id):
-        return self.peticion('DELETE', '/' + recurso + '/' + str(id) + '/')
+        return self.peticion('DELETE', self._ruta(recurso, id))
 
-    def consultarAsignaturas(self):
-        return self.peticion('GET', '/asignatura')
-
-    def guardarAsignatura(self, datos, id=None):
-        return self.guardar('asignatura', datos, id)
-
-    def eliminarAsignatura(self, id):
-        return self.eliminar('asignatura', id)
-
-    def consultarClases(self):
-        return self.peticion('GET', '/clase')
-
-    def guardarClase(self, datos, id=None):
-        return self.guardar('clase', datos, id)
-
-    def eliminarClase(self, id):
-        return self.eliminar('clase', id)
+    def guardar(self, recurso, datos, id=None):
+        if id is None:
+            return self.crear(recurso, datos)
+        return self.reemplazar(recurso, id, datos)

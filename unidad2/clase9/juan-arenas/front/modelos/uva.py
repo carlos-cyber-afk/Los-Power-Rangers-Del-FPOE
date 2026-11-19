@@ -1,7 +1,7 @@
 import tkinter as tk
 
 
-class Asignatura():
+class Uva():
 
     def __init__(self, ventana_principal):
         self.textura = tk.StringVar(ventana_principal)
@@ -22,3 +22,18 @@ class Asignatura():
             'tamaño': self.tamaño.get(),
             'peso': self.peso.get(),
         }
+    def __init__(self, ventana_principal):
+        self.id = None
+        self.nombre = tk.StringVar(ventana_principal)
+        self.creditos = tk.StringVar(ventana_principal)
+        self.clases_por_programar = tk.StringVar(ventana_principal)
+        self.activa = tk.BooleanVar(ventana_principal, value=True)
+        self.fecha_inicio = tk.StringVar(ventana_principal)
+
+    def cargar(self, datos):
+       self.id = datos['id']
+       self.nombre.set(datos['nombre'])
+       self.creditos.set(datos['creditos'])
+       self.clases_por_programar.set(datos['clases_por_programar'])
+       self.activa.set(datos['activa'])
+       self.fecha_inicio.set(datos['fecha_inicio'])

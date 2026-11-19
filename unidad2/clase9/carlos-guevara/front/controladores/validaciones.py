@@ -8,20 +8,20 @@ class Validaciones():
     def validarTitulo(valor):
         texto = valor.strip()
         if not texto:
-            return 'Título: falta este dato.'
-        if len(texto) > 150:
-            return 'Título: admite máximo 150 caracteres.'
+            return 'esta casilla no puede estar vacía.'
+        if len(texto) > 100:
+            return 'Se admite máximo 100 caracteres.'
         if not re.fullmatch(r"[A-Za-z0-9ñÑáéíóúÁÉÍÓÚüÜ .,:;¿?¡!'\-]+", texto):
-            return 'Título: hay caracteres no permitidos.'
+            return 'hay caracteres no permitidos.'
         return None
 
     @staticmethod
     def validarPaginas(valor):
         texto = valor.strip()
         if not texto:
-            return 'Páginas: falta este dato.'
+            return 'esta casilla no puede estar vacía.'
         if not re.fullmatch('[0-9]+', texto) or not 1 <= int(texto) <= 5000:
-            return 'Páginas: debe ser un entero entre 1 y 5000.'
+            return 'no se pueden ingresar números negativos y mayores a 5000.'
         return None
 
     @staticmethod
@@ -29,9 +29,9 @@ class Validaciones():
         try:
             fecha = datetime.strptime(valor.strip(), '%d/%m/%Y')
         except ValueError:
-            return 'Fecha de publicación: use el formato dd/mm/aaaa y una fecha que exista.'
+            return 'solo se admite el formato dd/mm/aaaa.'
         if fecha > datetime.now():
-            return 'Fecha de publicación: no puede ser futura.'
+            return 'la fecha no puede ser futura.'
         return None
 
     @staticmethod

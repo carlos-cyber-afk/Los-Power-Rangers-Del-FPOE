@@ -9,11 +9,12 @@ class ErrorComunicacion(Exception):
 class Comunicacion():
 
     def __init__(self):
-        self.url = 'http://localhost:8000/api/'
-
+        self.url = 'http://127.0.0.1:8000/api/'
+        self.sesion = requests.Session()
+        self.sesion.trust_env = False   # no consulta proxies del sistema
     def peticion(self, metodo, ruta, datos=None):
         try:
-            resultado = requests.request(metodo, self.url + ruta, json=datos, timeout=5)
+            resultado = self.sesion.request(metodo, self.url + ruta, json=datos, timeout=5)
         except requests.RequestException:
             raise ErrorComunicacion(
                 'No se pudo conectar con el servidor. ¿Está corriendo el back?'

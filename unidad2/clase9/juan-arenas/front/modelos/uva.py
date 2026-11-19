@@ -7,6 +7,7 @@ class Uva():
         self.id = None
         self.textura = tk.StringVar(ventana_principal)
         self.forma = tk.StringVar(ventana_principal)
+        self.tamaño = tk.StringVar(ventana_principal)
         self.peso = tk.StringVar(ventana_principal)
 
     def cargar(self, datos):

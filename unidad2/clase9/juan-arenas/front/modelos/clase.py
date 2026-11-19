@@ -10,26 +10,26 @@ class Clase():
         self.uva = tk.StringVar(ventana_principal)
         self.forma = tk.StringVar(ventana_principal)
         self.textura = tk.StringVar(ventana_principal)
-        self.tamaño = tk.IntVar(ventana_principal)
-        self.peso = tk.FloatVar(ventana_principal)
+        self.tamaño = tk.StringVar(ventana_principal)
+        self.peso = tk.StringVar(ventana_principal)
         self.modalidad = tk.StringVar(ventana_principal, value='PRESENCIAL')
 
-    def cargar(self, datos):
+    def cargar(self, datos, etiqueta_uva=''):
         self.id = datos['id']
-        self.asignatura.set(datos['uva_id'])
-        self.forma.set(datos['formar'])
+        self.uva.set(etiqueta_uva)
+        self.forma.set(datos['forma'])
         self.textura.set(datos['textura'])
-        self.tamaño.set(datos['tamaño'])
+        self.tamaño.set(datos['tamano'])
         self.peso.set(datos['peso'])
         self.modalidad.set(datos['modalidad'])
 
     def limpiar(self):
         self.id = None
-        self.asignatura.set('')
+        self.uva.set('')
         self.forma.set('')
         self.textura.set('')
-        self.tamaño.set(0)
-        self.peso.set(0.0)
+        self.tamaño.set('')
+        self.peso.set('')
         self.modalidad.set('PRESENCIAL')
 
     def a_diccionario(self, id_uva):
@@ -37,9 +37,7 @@ class Clase():
             'uva': id_uva,
             'forma': self.forma.get().strip(),
             'textura': self.textura.get().strip(),
-            'tamaño': self.tamaño.get().strip(),
-            'peso': self.peso.get().strip(),
+            'tamano': int(self.tamaño.get().strip()),
+            'peso': float(self.peso.get().strip().replace(',', '.')),
             'modalidad': self.modalidad.get(),
         }
-
-    

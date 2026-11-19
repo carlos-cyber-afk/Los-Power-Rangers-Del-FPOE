@@ -21,12 +21,12 @@ class Interfaz():
             self.ventana_principal.destroy()
 
     def mostrar_interfaz(self):
-        self.ventana_principal.title('Gestión académica')
+        self.ventana_principal.title('Gestión de uvas')
         self.ventana_principal.geometry('900x600')
         self.ventana_principal.minsize(820, 520)
 
         self.pestanas = ttk.Notebook(self.ventana_principal)
-        self.pestanas.add(VistaAsignaturas(self.pestanas, self.comunicacion), text='Asignaturas')
+        self.pestanas.add(VistaUva(self.pestanas, self.comunicacion), text='Uvas')
         self.pestanas.add(VistaClases(self.pestanas, self.comunicacion), text='Clases')
         self.pestanas.pack(fill='both', expand=True)
         self.pestanas.bind('<<NotebookTabChanged>>', self.al_cambiar_pestana)

@@ -1,81 +1,129 @@
-def crear_modelo(self):
-        self.uva = {}
+import tkinter as tk
+from tkinter import ttk
+
+from controladores.validaciones import Validaciones
+from modelos.clase import Clase
+from vistas.vista_base import VistaBase
+
+TODAS = 'Todas'
+
+
+class VistaClases(VistaBase):
+
+    titulo_formulario = 'Datos de la clase'
+    recurso = 'clases'
+    columnas = (
+        ('id', 'Id', 50),
+        ('uva', 'Uva', 200),
+        ('forma', 'Forma', 130),
+        ('textura', 'Textura', 130),
+        ('tamano', 'Tamaño', 70),
+        ('peso', 'Peso', 70),
+        ('modalidad', 'Modalidad', 110),
+    )
+
+    def crear_modelo(self):
+        self.uvas = {}        # etiqueta -> id
+        self.etiquetas = {}   # id -> etiqueta
         self.id_filtro = None
         return Clase(self)
 
-def crear_campos(self, marco):
-    self.combo_asignatura = ttk.Combobox(
-        marco, textvariable=self.modelo.asignatura, state='readonly'
-    )
-    combo_modalidad = ttk.Combobox(
-        marco, textvariable=self.modelo.modalidad, values=Clase.MODALIDADES, state='readonly'
-    )
-    entry_tema = ttk.Entry(marco, textvariable=self.modelo.tema)
-    entry_fecha = ttk.Entry(marco, textvariable=self.modelo.fecha)
-    entry_hora = ttk.Entry(marco, textvariable=self.modelo.hora_inicio)
-    entry_duracion = ttk.Entry(marco, textvariable=self.modelo.duracion_horas)
+    @staticmethod
+    def etiqueta_uva(uva):
+        # Las uvas no tienen nombre, se identifican por id, forma y textura
+        return '#' + str(uva['id']) + ' ' + uva['forma'] + ' / ' + uva['textura']
 
-    self.agregar_campo(marco, 0, 0, 'uva', self.combo_uva)
-    self.agregar_campo(marco, 0, 2, 'forma', entry_forma)
-    self.agregar_campo(marco, 1, 0, 'F (textura', entry_textura)
-    self.agregar_campo(marco, 1, 2, 'Hora de inicio (HH:MM)', entry_hora)
-    self.agregar_campo(marco, 2, 0, 'Duración en horas (0.5 a 4)', entry_duracion)
-    self.agregar_campo(marco, 2, 2, 'Modalidad', combo_modalidad)
+    @staticmethod
+    def id_uva_de(clase):
+        # El back puede devolver la uva como "uva_id" o como "uva"
+        return clase.get('uva_id', clase.get('uva'))
 
-def consultar_registros(self):
-    asignaturas = self.comunicacion.listar('asignaturas')
-    filtros = {'asignatura': self.id_filtro} if self.id_filtro else None
-    clases = self.comunicacion.listar('clases', filtros)
-    return {'asignaturas': asignaturas, 'clases': clases}
+    def crear_campos(self, marco):
+        self.combo_uva = ttk.Combobox(marco, textvariable=self.modelo.uva, state='readonly')
+        combo_modalidad = ttk.Combobox(
+            marco, textvariable=self.modelo.modalidad, values=Clase.MODALIDADES, state='readonly'
+        )
+        entry_forma = ttk.Entry(marco, textvariable=self.modelo.forma)
+        entry_textura = ttk.Entry(marco, textvariable=self.modelo.textura)
+        spin_tamaño = ttk.Spinbox(marco, from_=1, to=10, textvariable=self.modelo.tamaño)
+        entry_peso = ttk.Entry(marco, textvariable=self.modelo.peso)
 
-def mostrar_registros(self, datos):
-    asignaturas = datos['asignaturas']
-    self.asignaturas = {asignatura['nombre']: asignatura['id'] for asignatura in asignaturas}
-    nombres = list(self.asignaturas)
-    self.combo_asignatura.config(values=nombres)
-    self.combo_filtro.config(values=[TODAS] + nombres)
+        self.agregar_campo(marco, 0, 0, 'Uva', self.combo_uva)
+        self.agregar_campo(marco, 0, 2, 'Modalidad', combo_modalidad)
+        self.agregar_campo(marco, 1, 0, 'Forma', entry_forma)
+        self.agregar_campo(marco, 1, 2, 'Textura', entry_textura)
+        self.agregar_campo(marco, 2, 0, 'Tamaño (1 a 10)', spin_tamaño)
+        self.agregar_campo(marco, 2, 2, 'Peso (0.1 a 15)', entry_peso)
 
-    if self.id_filtro is None:
-        total_horas = sum(asignatura['total_horas'] for asignatura in asignaturas)
-    else:
-        filtrada = [a for a in asignaturas if a['id'] == self.id_filtro]
-        if not filtrada:
-            self.filtro.set(TODAS)
+    def crear_botones_extra(self, marco):
+        self.filtro = tk.StringVar(self, value=TODAS)
+        etiqueta = ttk.Label(marco, text='Ver clases de')
+        self.combo_filtro = ttk.Combobox(marco, textvariable=self.filtro, state='readonly', width=28)
+        self.label_total = ttk.Label(marco)
+
+        etiqueta.pack(side='left', padx=(24, 6))
+        self.combo_filtro.pack(side='left')
+        self.label_total.pack(side='left', padx=12)
+
+        self.combo_filtro.bind('<<ComboboxSelected>>', self.al_cambiar_filtro)
+
+    def consultar_registros(self):
+        uvas = self.comunicacion.listar('uvas')
+        clases = self.comunicacion.listar('clases')
+        return {'uvas': uvas, 'clases': clases}
+
+    def mostrar_registros(self, datos):
+        uvas = datos['uvas']
+        self.etiquetas = {uva['id']: self.etiqueta_uva(uva) for uva in uvas}
+        self.uvas = {etiqueta: id for id, etiqueta in self.etiquetas.items()}
+        etiquetas = list(self.uvas)
+        self.combo_uva.config(values=etiquetas)
+        self.combo_filtro.config(values=[TODAS] + etiquetas)
+
+        # Si la uva del filtro ya no existe, se vuelve a mostrar todo
+        if self.id_filtro is not None and self.id_filtro not in self.etiquetas:
             self.id_filtro = None
-            self.refrescar()
-            return
-        self.filtro.set(filtrada[0]['nombre'])
-        total_horas = filtrada[0]['total_horas']
+        self.filtro.set(TODAS if self.id_filtro is None else self.etiquetas[self.id_filtro])
 
-    clases = datos['clases']
-    self.label_total.config(
-        text=str(len(clases)) + ' clases, ' + format(total_horas, 'g') + ' horas'
-    )
-    super().mostrar_registros(clases)
+        clases = datos['clases']
+        if self.id_filtro is not None:
+            clases = [c for c in clases if self.id_uva_de(c) == self.id_filtro]
 
-def validar(self):
-    errores = Validaciones.validarClase(self.modelo)
-    nombre = self.modelo.asignatura.get()
-    if nombre and nombre not in self.asignaturas:
-        errores.append('Asignatura: ya no existe. Consulte de nuevo.')
-    return errores
+        peso_total = sum(float(clase['peso']) for clase in clases)
+        self.label_total.config(
+            text=str(len(clases)) + ' clases, peso total ' + format(peso_total, 'g')
+        )
+        super().mostrar_registros(clases)
 
-def datos_formulario(self):
-    id_asignatura = self.asignaturas[self.modelo.asignatura.get()]
-    return self.modelo.a_diccionario(id_asignatura)
+    def cargar_modelo(self, registro):
+        etiqueta = self.etiquetas.get(self.id_uva_de(registro), '')
+        self.modelo.cargar(registro, etiqueta)
 
-def crear_botones_extra(self, marco):
-    self.filtro = tk.StringVar(self, value=TODAS)
-    etiqueta = ttk.Label(marco, text='Ver clases de')
-    self.combo_filtro = ttk.Combobox(marco, textvariable=self.filtro, state='readonly', width=24)
-    self.label_total = ttk.Label(marco)
+    def validar(self):
+        errores = Validaciones.validarClase(self.modelo)
+        etiqueta = self.modelo.uva.get()
+        if etiqueta and etiqueta not in self.uvas:
+            errores.append('Uva: ya no existe. Consulte de nuevo.')
+        return errores
 
-    etiqueta.pack(side='left', padx=(24, 6))
-    self.combo_filtro.pack(side='left')
-    self.label_total.pack(side='left', padx=12)
+    def datos_formulario(self):
+        id_uva = self.uvas[self.modelo.uva.get()]
+        return self.modelo.a_diccionario(id_uva)
 
-    self.combo_filtro.bind('<<ComboboxSelected>>', self.al_cambiar_filtro)
+    def valores_fila(self, registro):
+        return (
+            registro['id'],
+            self.etiquetas.get(self.id_uva_de(registro), ''),
+            registro['forma'],
+            registro['textura'],
+            registro['tamano'],
+            registro['peso'],
+            registro['modalidad'],
+        )
 
-def al_cambiar_filtro(self, evento):
-    self.id_filtro = self.asignaturas.get(self.filtro.get())
-    self.refrescar()
+    def texto_confirmar_eliminar(self, registro):
+        return '¿Eliminar la clase #' + str(registro['id']) + '?'
+
+    def al_cambiar_filtro(self, evento):
+        self.id_filtro = self.uvas.get(self.filtro.get())
+        self.refrescar()

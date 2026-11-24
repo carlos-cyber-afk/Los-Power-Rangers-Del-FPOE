@@ -1,26 +1,19 @@
 """
 Modelo Producto.
 
-Cada producto pertenece a una sola categoría (llave foránea en Producto).
+Un producto se puede retirar de la venta (activo=False) sin perder su historial.
 """
 from django.db import models
 
-from .categoria import categoria
-
 
 class producto(models.Model):
-    nombre = models.CharField(max_length=80)
+    nombre = models.CharField(max_length=100, unique=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(default=0)
-    # Llave foránea: PROTECT impide borrar una categoría que tenga productos.
-    categoria = models.ForeignKey(
-        categoria,
-        on_delete=models.PROTECT,
-        related_name="productos",
-    )
+    activo = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["nombre"]
 
     def __str__(self):
-        return f"{self.nombre} ({self.categoria})"
+        return self.nombre

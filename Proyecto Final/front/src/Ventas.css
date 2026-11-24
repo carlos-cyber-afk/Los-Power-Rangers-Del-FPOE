@@ -1,0 +1,52 @@
+/* Reutiliza las clases de Productos.css (formulario, tabla, aviso...). Aquí solo lo nuevo. */
+.formulario select,
+.formulario textarea,
+.fila-detalle select,
+.fila-detalle input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: #fff;
+  color: #1f2a26;
+  font: inherit;
+}
+
+.formulario textarea { resize: vertical; }
+
+.formulario select:focus-visible,
+.formulario textarea:focus-visible,
+.fila-detalle select:focus-visible,
+.fila-detalle input:focus-visible {
+  outline: 3px solid var(--acento);
+  outline-offset: 2px;
+}
+
+/* Panel de productos de la venta */
+.detalles { margin-top: 1.25rem; }
+.detalles h2 { margin: 0 0 1rem; font-size: 1.25rem; }
+
+.fila-detalle {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.fila-detalle label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.campo-producto { flex: 1 1 260px; }
+.campo-cantidad { flex: 0 0 110px; }
+
+.total {
+  margin: 1rem 0 0;
+  text-align: right;
+  font-size: 1.3rem;
+}

@@ -4,10 +4,9 @@ from django.db import models
 class venta(models.Model):
 
     class MetodoPago(models.TextChoices):
-        EFECTIVO = "EF", "Efectivo"
-        TARJETA_DEBITO = "TD", "Tarjeta de Débito"
-        TARJETA_CREDITO = "TC", "Tarjeta de Crédito"
-        TRANSFERENCIA = "TR", "Transferencia"
+        EFECTIVO = "EFECTIVO", "Efectivo"
+        TARJETA = "TARJETA", "Tarjeta"
+        TRANSFERENCIA = "TRANSFERENCIA", "Transferencia"
 
     fecha = models.DateTimeField(auto_now_add=True)
     cliente = models.CharField(max_length=100)

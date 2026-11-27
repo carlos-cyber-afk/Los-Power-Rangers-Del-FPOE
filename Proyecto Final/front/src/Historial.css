@@ -1,0 +1,136 @@
+.historial {
+  /* Pon aquí los mismos colores que usas en Ventas.css */
+  --color-principal: #7a1d12;
+  --color-borde: #d6dcda;
+  --color-papel: #ffffff;
+  --color-texto: #1d2b28;
+  --color-suave: #5f6f6b;
+  --color-error: #b3261e;
+
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  color: var(--color-texto);
+}
+
+.historial__cabeza {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.historial__titulo {
+  margin: 0;
+  font-size: 1.75rem;
+  color: var(--color-principal);
+}
+
+.historial__buscar {
+  width: 100%;
+  max-width: 360px;
+  margin-bottom: 16px;
+  padding: 9px 12px;
+  border: 1px solid var(--color-borde);
+  border-radius: 6px;
+  font: inherit;
+  background: var(--color-papel);
+  color: var(--color-texto);
+}
+
+.historial__buscar:focus-visible,
+.hbtn:focus-visible {
+  outline: 3px solid #7cc9b9;
+  outline-offset: 1px;
+}
+
+.historial__vacio {
+  color: var(--color-suave);
+  margin: 8px 0;
+}
+
+.historial__error {
+  color: var(--color-error);
+  margin: 8px 0 12px;
+}
+
+.historial__tabla-caja {
+  background: var(--color-papel);
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.historial__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 560px;
+}
+
+.historial__tabla th,
+.historial__tabla td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.historial__tabla th {
+  font-weight: 600;
+  color: var(--color-suave);
+  font-size: 0.9rem;
+}
+
+.historial__tabla tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.historial__tabla .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.historial__tabla .acciones {
+  text-align: right;
+}
+
+.detalle-fila td {
+  background: #f6f8f7;
+}
+
+.detalle-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.detalle-lista li {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  padding: 6px 0;
+}
+
+.detalle-lista li span:nth-child(2) {
+  color: var(--color-suave);
+}
+
+.hbtn {
+  font: inherit;
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-principal);
+  border: 1px solid var(--color-principal);
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+
+.hbtn:hover:not(:disabled) {
+  background: var(--color-principal);
+  color: #fff;
+}
+
+.hbtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

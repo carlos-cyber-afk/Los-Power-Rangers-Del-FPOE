@@ -1,418 +1,284 @@
-import { useEffect, useState } from 'react'
-import { api } from './Api'
-import './Ventas.css'
+import { useEffect, useMemo, useState } from "react";
+import "./Ventas.css";
 
-const pesos = new Intl.NumberFormat('es-CO', {
-  style: 'currency',
-  currency: 'COP',
-  maximumFractionDigits: 2,
-})
+/* ============ AJUSTA ESTO A TU BACKEND ============ */
+const API = "http://127.0.0.1:8000/api";
+const RUTA_PRODUCTOS = "/productos/";
+const RUTA_VENTAS = "/ventas/";
+const RUTA_DETALLES = "/detalles/";
+const TIPOS_PAGO = [
+  { valor: "EFECTIVO", texto: "Efectivo" },
+  { valor: "TRANSFERENCIA", texto: "Transferencia" },
+  { valor: "TARJETA", texto: "Tarjeta" },
+];
+/* Campos que se leen de Producto: id, nombre, precio */
+/* Campos que se envían a Venta: cliente, metodo_pago */
+/* Campos que se envían a DetalleVenta: venta, producto, cantidad, precio_unitario */
+/* ================================================== */
 
-const METODOS = [
-  { valor: 'EFECTIVO', texto: 'Efectivo' },
-  { valor: 'TARJETA', texto: 'Tarjeta' },
-  { valor: 'TRANSFERENCIA', texto: 'Transferencia' },
-]
+const dinero = (n) =>
+  Number(n).toLocaleString("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
 
-const FORM_VACIO = { cliente: '', metodo_pago: 'EFECTIVO', observaciones: '' }
-const DETALLE_VACIO = { producto: '', cantidad: '1' }
-
-function formatearFecha(texto) {
-  return new Date(texto).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' })
-}
-
-function Ventas() {
-  const [ventas, setVentas] = useState([])
-  const [productos, setProductos] = useState([])
-  const [detalles, setDetalles] = useState([])
-  const [seleccionada, setSeleccionada] = useState(null)
-  
-  const [form, setForm] = useState(FORM_VACIO)
-  const [formDetalle, setFormDetalle] = useState(DETALLE_VACIO)
-  
-  // Estados de errores específicos por campo
-  const [erroresVenta, setErroresVenta] = useState({})
-  const [erroresDetalle, setErroresDetalle] = useState({})
-
-  const [aviso, setAviso] = useState(null)
-  const [cargando, setCargando] = useState(true)
-  const [enviando, setEnviando] = useState(false)
-
-  const venta = ventas.find((v) => v.id === seleccionada)
-  const disponibles = productos.filter((p) => p.activo && p.stock > 0)
-  const nombreDe = (d) => d.producto_nombre ?? productos.find((p) => p.id === d.producto)?.nombre ?? `Producto #${d.producto}`
-
-  const cargarVentas = async () => setVentas(await api.ventas.listar())
-  const cargarProductos = async () => setProductos(await api.productos.listar())
-  const cargarDetalles = async (id) => {
-    if (!id) return setDetalles([])
-    const datos = await api.detalles.listar(id)
-    setDetalles(datos)
-  }
-
-  const mostrarError = (err) => setAviso({ tipo: 'error', texto: err.message })
+export default function Ventas() {
+  const [productos, setProductos] = useState([]);
+  const [cantidades, setCantidades] = useState({}); // { idProducto: cantidad a agregar }
+  const [carrito, setCarrito] = useState([]); // [{ id, nombre, precio, cantidad }]
+  const [abierta, setAbierta] = useState(false);
+  const [form, setForm] = useState({ cliente: "", tipo_pago: "" });
+  const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState("");
+  const [aviso, setAviso] = useState("");
 
   useEffect(() => {
-    async function inicio() {
-      try {
-        await Promise.all([cargarVentas(), cargarProductos()])
-      } catch (err) {
-        mostrarError(err)
-      } finally {
-        setCargando(false)
+    fetch(API + RUTA_PRODUCTOS)
+      .then((r) => r.json())
+      .then((d) => setProductos(Array.isArray(d) ? d : d.results ?? []))
+      .catch(() => setAviso("No se pudieron cargar los productos."));
+  }, []);
+
+  /* Cerrar la ventana con Escape */
+  useEffect(() => {
+    if (!abierta) return;
+    const alTeclear = (e) => e.key === "Escape" && !enviando && cerrar();
+    window.addEventListener("keydown", alTeclear);
+    return () => window.removeEventListener("keydown", alTeclear);
+  }, [abierta, enviando]);
+
+  const total = useMemo(
+    () => carrito.reduce((s, i) => s + i.precio * i.cantidad, 0),
+    [carrito]
+  );
+
+  const cantidadDe = (id) => cantidades[id] ?? "1";
+
+  const cambiarCantidad = (id, valor) =>
+    setCantidades((c) => ({ ...c, [id]: valor }));
+
+  const normalizarCantidad = (id) =>
+    setCantidades((c) => ({
+      ...c,
+      [id]: String(Math.max(1, parseInt(c[id], 10) || 1)),
+    }));
+
+  const agregar = (p) => {
+    const cantidad = Math.max(1, parseInt(cantidadDe(p.id), 10) || 1);
+    setAviso("");
+    setCarrito((actual) => {
+      const existe = actual.find((i) => i.id === p.id);
+      if (existe) {
+        return actual.map((i) =>
+          i.id === p.id ? { ...i, cantidad: i.cantidad + cantidad } : i
+        );
       }
-    }
-    inicio()
-  }, [])
+      return [...actual, { id: p.id, nombre: p.nombre, precio: Number(p.precio), cantidad }];
+    });
+    setCantidades((c) => ({ ...c, [p.id]: "1" }));
+  };
 
-  async function seleccionar(id) {
-    setSeleccionada(id)
-    setDetalles([])
-    setFormDetalle(DETALLE_VACIO)
-    setErroresDetalle({})
-    setAviso(null)
+  const quitar = (id) => setCarrito((c) => c.filter((i) => i.id !== id));
+
+  const abrir = () => {
+    if (carrito.length === 0) return;
+    setError("");
+    setAbierta(true);
+  };
+
+  const cerrar = () => {
+    setAbierta(false);
+    setError("");
+  };
+
+  const formCompleto =
+    carrito.length > 0 && form.cliente.trim() && form.tipo_pago;
+
+  const confirmarPago = async () => {
+    if (carrito.length === 0) {
+      setError("Agrega al menos un producto para poder comprar.");
+      return;
+    }
+    setEnviando(true);
+    setError("");
     try {
-      await cargarDetalles(id)
-    } catch (err) {
-      mostrarError(err)
-    }
-  }
-
-  // Validación local del formulario Nueva Venta
-  function validarVenta(f) {
-    const errores = {}
-    const letras = 'A-Za-zÁÉÍÓÚÜÑáéíóúüñ'
-    const cliente = f.cliente.trim()
-
-    if (!cliente) {
-      errores.cliente = 'Escribe el nombre del cliente.'
-    } else if (cliente.length < 2) {
-      errores.cliente = 'El nombre del cliente debe tener al menos 2 caracteres.'
-    } else if (!new RegExp(`^[${letras}0-9 .,()-]+$`).test(cliente) || !new RegExp(`[${letras}]`).test(cliente)) {
-      errores.cliente = 'El nombre solo puede contener letras, números, espacios y . , - ( ), y al menos una letra.'
-    }
-
-    return errores
-  }
-
-  async function crearVenta(e) {
-    e.preventDefault()
-    setErroresVenta({})
-
-    const errores = validarVenta(form)
-    if (Object.keys(errores).length > 0) {
-      setErroresVenta(errores)
-      return
-    }
-
-    setEnviando(true)
-    setAviso(null)
-    try {
-      const nueva = await api.ventas.crear({
-        cliente: form.cliente.trim(),
-        metodo_pago: form.metodo_pago,
-        observaciones: form.observaciones.trim(),
-      })
-      setForm(FORM_VACIO)
-      setErroresVenta({})
-      await cargarVentas()
-      await seleccionar(nueva.id)
-      setAviso({ tipo: 'ok', texto: 'Venta creada. Ahora agrégale productos.' })
-    } catch (err) {
-      if (err.datos && typeof err.datos === 'object') {
-        const errMap = {}
-        Object.entries(err.datos).forEach(([k, v]) => { errMap[k] = Array.isArray(v) ? v.join(' ') : v })
-        setErroresVenta(errMap)
-      } else {
-        mostrarError(err)
+      // 1) crear la venta
+      const rv = await fetch(API + RUTA_VENTAS, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cliente: form.cliente.trim(),
+          metodo_pago: form.tipo_pago,
+        }),
+      });
+      if (!rv.ok) {
+        const detalle = await rv.text();
+        throw new Error(`No se pudo crear la venta: ${detalle}`);
       }
+      const venta = await rv.json();
+
+      // 2) crear un detalle por cada producto del carrito
+      for (const item of carrito) {
+        const rd = await fetch(API + RUTA_DETALLES, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            venta: venta.id,
+            producto: item.id,
+            cantidad: item.cantidad,
+            precio_unitario: item.precio,
+          }),
+        });
+        if (!rd.ok) {
+          const msg = await rd.text();
+          throw new Error(`Falló "${item.nombre}": ${msg}`);
+        }
+      }
+
+      // 3) todo salió bien: cerrar ventana y limpiar
+      setCarrito([]);
+      setForm({ cliente: "", tipo_pago: "" });
+      setAbierta(false);
+      setAviso("Pago confirmado. La venta quedó registrada.");
+    } catch (e) {
+      setError(e.message);
     } finally {
-      setEnviando(false)
+      setEnviando(false);
     }
-  }
-
-  // Validación local del formulario Agregar Producto a Venta
-  function validarDetalle(f) {
-    const errores = {}
-    if (!f.producto) {
-      errores.producto = 'Debes elegir un producto.'
-    }
-    const cantidad = Number(f.cantidad)
-    if (f.cantidad === '' || Number.isNaN(cantidad)) {
-      errores.cantidad = 'Ingresa una cantidad válida.'
-    } else if (!Number.isInteger(cantidad) || cantidad < 1) {
-      errores.cantidad = 'La cantidad no puede ser menor que 1.'
-    } else {
-      const prod = productos.find((p) => p.id === Number(f.producto))
-      if (prod && cantidad > prod.stock) {
-        errores.cantidad = `Solo quedan ${prod.stock} de ${prod.nombre}.`
-      }
-    }
-    return errores
-  }
-
-  async function agregarDetalle(e) {
-    e.preventDefault()
-    setErroresDetalle({})
-
-    if (!seleccionada) return setAviso({ tipo: 'error', texto: 'No hay ninguna venta seleccionada.' })
-
-    const errores = validarDetalle(formDetalle)
-    if (Object.keys(errores).length > 0) {
-      setErroresDetalle(errores)
-      return
-    }
-
-    const producto = productos.find((p) => p.id === Number(formDetalle.producto))
-    const cantidad = Number(formDetalle.cantidad)
-
-    setEnviando(true)
-    setAviso(null)
-    try {
-      await api.detalles.crear({
-        venta: seleccionada,
-        producto: producto.id,
-        cantidad,
-        precio_unitario: producto.precio,
-      })
-      setFormDetalle(DETALLE_VACIO)
-      setErroresDetalle({})
-      await Promise.all([cargarVentas(), cargarProductos(), cargarDetalles(seleccionada)])
-      setAviso({ tipo: 'ok', texto: 'Producto agregado a la venta.' })
-    } catch (err) {
-      if (err.datos && typeof err.datos === 'object') {
-        const errMap = {}
-        Object.entries(err.datos).forEach(([k, v]) => { errMap[k] = Array.isArray(v) ? v.join(' ') : v })
-        setErroresDetalle(errMap)
-      } else {
-        mostrarError(err)
-      }
-    } finally {
-      setEnviando(false)
-    }
-  }
-
-  async function eliminarVenta(v) {
-    if (!window.confirm(`¿Eliminar la venta de ${v.cliente}? Se borrarán también sus productos.`)) return
-    setAviso(null)
-    try {
-      await api.ventas.eliminar(v.id)
-      if (seleccionada === v.id) {
-        setSeleccionada(null)
-        setDetalles([])
-      }
-      await Promise.all([cargarVentas(), cargarProductos()])
-      setAviso({ tipo: 'ok', texto: 'Venta eliminada.' })
-    } catch (err) {
-      mostrarError(err)
-    }
-  }
-
-  async function quitarDetalle(d) {
-    setAviso(null)
-    try {
-      await api.detalles.eliminar(d.id)
-      await Promise.all([cargarVentas(), cargarProductos(), cargarDetalles(seleccionada)])
-      setAviso({ tipo: 'ok', texto: 'Producto quitado de la venta.' })
-    } catch (err) {
-      mostrarError(err)
-    }
-  }
-
-  const detallesDeVentaElegida = detalles.filter((d) => d.venta === seleccionada || !d.venta)
+  };
 
   return (
-    <main className="catalogo">
-      <h1 className="catalogo-titulo">Ventas</h1>
+    <section className="ventas">
+      <h2 className="ventas__titulo">Ventas</h2>
+      {aviso && <p className="ventas__aviso">{aviso}</p>}
 
-      {aviso && (
-        <p className={`aviso aviso-${aviso.tipo}`} role={aviso.tipo === 'error' ? 'alert' : 'status'}>
-          {aviso.texto}
-        </p>
-      )}
-
-      <div className="catalogo-cuerpo">
-        {/* Formulario Nueva Venta */}
-        <form className="tarjeta formulario" onSubmit={crearVenta} noValidate>
-          <h2>Nueva venta</h2>
-
-          <label htmlFor="cliente">Cliente</label>
-          <input
-            id="cliente"
-            className={erroresVenta.cliente ? 'input-error' : ''}
-            value={form.cliente}
-            maxLength={100}
-            onChange={(e) => {
-              setForm({ ...form, cliente: e.target.value })
-              if (erroresVenta.cliente) setErroresVenta({ ...erroresVenta, cliente: null })
-            }}
-          />
-          {erroresVenta.cliente && (
-            <span className="mensaje-error-campo">{erroresVenta.cliente}</span>
-          )}
-
-          <label htmlFor="metodo_pago">Forma de pago</label>
-          <select
-            id="metodo_pago"
-            className={erroresVenta.metodo_pago ? 'input-error' : ''}
-            value={form.metodo_pago}
-            onChange={(e) => {
-              setForm({ ...form, metodo_pago: e.target.value })
-              if (erroresVenta.metodo_pago) setErroresVenta({ ...erroresVenta, metodo_pago: null })
-            }}
-          >
-            {METODOS.map((m) => (
-              <option key={m.valor} value={m.valor}>{m.texto}</option>
+      <div className="ventas__layout">
+        {/* ============ IZQUIERDA: productos ============ */}
+        <div className="ventas__productos">
+          <h3>Productos</h3>
+          {productos.length === 0 && <p className="vacio">No hay productos para mostrar.</p>}
+          <ul className="lista">
+            {productos.map((p) => (
+              <li key={p.id} className="producto">
+                <div className="producto__info">
+                  <strong>{p.nombre}</strong>
+                  <span>{dinero(p.precio)}</span>
+                </div>
+                <input
+                  className="producto__cantidad"
+                  type="number"
+                  min="1"
+                  value={cantidadDe(p.id)}
+                  onChange={(e) => cambiarCantidad(p.id, e.target.value)}
+                  onBlur={() => normalizarCantidad(p.id)}
+                  aria-label={`Cantidad de ${p.nombre}`}
+                />
+                <button className="btn btn--agregar" onClick={() => agregar(p)}>
+                  Agregar
+                </button>
+              </li>
             ))}
-          </select>
-          {erroresVenta.metodo_pago && (
-            <span className="mensaje-error-campo">{erroresVenta.metodo_pago}</span>
-          )}
-
-          <label htmlFor="observaciones">Observaciones (opcional)</label>
-          <textarea
-            id="observaciones"
-            rows={3}
-            value={form.observaciones}
-            onChange={(e) => setForm({ ...form, observaciones: e.target.value })}
-          />
-
-          <div className="formulario-botones">
-            <button className="btn btn-acento" type="submit" disabled={enviando}>
-              Crear venta
-            </button>
-          </div>
-        </form>
-
-        {/* Tabla de ventas */}
-        <div className="tarjeta tabla-caja">
-          {cargando ? (
-            <p className="vacio">Cargando ventas…</p>
-          ) : ventas.length === 0 ? (
-            <p className="vacio">Aún no hay ventas. Crea la primera con el formulario.</p>
-          ) : (
-            <table className="tabla">
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Cliente</th>
-                  <th>Pago</th>
-                  <th className="num">Total</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ventas.map((v) => (
-                  <tr key={v.id} className={seleccionada === v.id ? 'editando' : ''}>
-                    <td>{formatearFecha(v.fecha)}</td>
-                    <td>{v.cliente}</td>
-                    <td>{METODOS.find((m) => m.valor === v.metodo_pago)?.texto ?? v.metodo_pago}</td>
-                    <td className="num">{pesos.format(v.total ?? 0)}</td>
-                    <td>
-                      <div className="acciones">
-                        <button className="enlace" onClick={() => seleccionar(v.id)}>Ver productos</button>
-                        <button className="enlace peligro" onClick={() => eliminarVenta(v)}>Eliminar</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+          </ul>
         </div>
+
+        {/* ============ DERECHA: selección ============ */}
+        <aside className="ventas__carrito">
+          <h3>Tu selección</h3>
+          {carrito.length === 0 ? (
+            <p className="vacio">Agrega productos desde la lista de la izquierda.</p>
+          ) : (
+            <ul className="lista">
+              {carrito.map((i) => (
+                <li key={i.id} className="item">
+                  <div className="item__info">
+                    <strong>{i.nombre}</strong>
+                    <span>
+                      {i.cantidad} × {dinero(i.precio)}
+                    </span>
+                  </div>
+                  <span className="item__subtotal">{dinero(i.precio * i.cantidad)}</span>
+                  <button
+                    className="btn btn--quitar"
+                    onClick={() => quitar(i.id)}
+                    aria-label={`Quitar ${i.nombre}`}
+                  >
+                    ✕
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div className="carrito__total">
+            <span>Total</span>
+            <strong>{dinero(total)}</strong>
+          </div>
+          <button className="btn btn--comprar" onClick={abrir} disabled={carrito.length === 0}>
+            Comprar
+          </button>
+        </aside>
       </div>
 
-      {/* Detalles de la venta seleccionada */}
-      {venta && (
-        <section className="tarjeta detalles">
-          <h2>Productos de la venta de {venta.cliente}</h2>
+      {/* ============ VENTANA DE PAGO ============ */}
+      {abierta && (
+        <div className="modal" onClick={() => !enviando && cerrar()}>
+          <div
+            className="modal__caja"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="titulo-pago"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="titulo-pago">Datos de la compra</h3>
 
-          <form className="fila-detalle" onSubmit={agregarDetalle} noValidate>
-            <div className="campo-producto">
-              <label htmlFor="producto">Producto</label>
+            <label>
+              Nombre
+              <input
+                type="text"
+                value={form.cliente}
+                onChange={(e) => setForm({ ...form, cliente: e.target.value })}
+                autoFocus
+              />
+            </label>
+
+            <label>
+              Tipo de pago
               <select
-                id="producto"
-                className={erroresDetalle.producto ? 'input-error' : ''}
-                value={formDetalle.producto}
-                onChange={(e) => {
-                  setFormDetalle({ ...formDetalle, producto: e.target.value })
-                  if (erroresDetalle.producto) setErroresDetalle({ ...erroresDetalle, producto: null })
-                }}
+                value={form.tipo_pago}
+                onChange={(e) => setForm({ ...form, tipo_pago: e.target.value })}
               >
-                <option value="">Elige un producto…</option>
-                {disponibles.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.nombre} — {pesos.format(p.precio)} ({p.stock} disponibles)
+                <option value="">Selecciona uno</option>
+                {TIPOS_PAGO.map((t) => (
+                  <option key={t.valor} value={t.valor}>
+                    {t.texto}
                   </option>
                 ))}
               </select>
-              {erroresDetalle.producto && (
-                <span className="mensaje-error-campo">{erroresDetalle.producto}</span>
-              )}
+            </label>
+
+
+            <p className="modal__total">
+              Total a pagar: <strong>{dinero(total)}</strong>
+            </p>
+
+            {error && <p className="modal__error">{error}</p>}
+
+            <div className="modal__acciones">
+              <button className="btn btn--cancelar" onClick={cerrar} disabled={enviando}>
+                Cancelar
+              </button>
+              <button
+                className="btn btn--confirmar"
+                onClick={confirmarPago}
+                disabled={!formCompleto || enviando}
+              >
+                {enviando ? "Procesando…" : "Confirmar pago"}
+              </button>
             </div>
-
-            <div className="campo-cantidad">
-              <label htmlFor="cantidad">Cantidad</label>
-              <input
-                id="cantidad"
-                type="number"
-                min="1"
-                step="1"
-                className={erroresDetalle.cantidad ? 'input-error' : ''}
-                value={formDetalle.cantidad}
-                onChange={(e) => {
-                  setFormDetalle({ ...formDetalle, cantidad: e.target.value })
-                  if (erroresDetalle.cantidad) setErroresDetalle({ ...erroresDetalle, cantidad: null })
-                }}
-              />
-              {erroresDetalle.cantidad && (
-                <span className="mensaje-error-campo">{erroresDetalle.cantidad}</span>
-              )}
-            </div>
-
-            <button className="btn btn-acento" type="submit" disabled={enviando}>
-              Agregar
-            </button>
-          </form>
-
-          {detallesDeVentaElegida.length === 0 ? (
-            <p className="vacio">Esta venta aún no tiene productos.</p>
-          ) : (
-            <div className="tabla-caja">
-              <table className="tabla">
-                <thead>
-                  <tr>
-                    <th>Producto</th>
-                    <th className="num">Cantidad</th>
-                    <th className="num">Precio unitario</th>
-                    <th className="num">Subtotal</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detallesDeVentaElegida.map((d) => (
-                    <tr key={d.id}>
-                      <td>{nombreDe(d)}</td>
-                      <td className="num">{d.cantidad}</td>
-                      <td className="num">{pesos.format(d.precio_unitario)}</td>
-                      <td className="num">{pesos.format(d.cantidad * d.precio_unitario)}</td>
-                      <td>
-                        <button className="enlace peligro" onClick={() => quitarDetalle(d)}>Quitar</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          <p className="total">
-            Total: <strong>{pesos.format(venta.total ?? 0)}</strong>
-          </p>
-        </section>
+          </div>
+        </div>
       )}
-    </main>
-  )
+    </section>
+  );
 }
-
-export default Ventas

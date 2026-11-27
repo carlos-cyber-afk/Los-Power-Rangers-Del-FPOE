@@ -1,52 +1,263 @@
-/* Reutiliza las clases de Productos.css (formulario, tabla, aviso...). Aquí solo lo nuevo. */
-.formulario select,
-.formulario textarea,
-.fila-detalle select,
-.fila-detalle input {
-  width: 100%;
-  min-height: 44px;
-  padding: 0.5rem 0.8rem;
+.ventas {
+  --verde: #7a1d12;
+  --verde-oscuro: #7a1d12;;
+  --fondo: #efefef;
+  --papel: #ffffff;
+  --texto: #1d2b28;
+  --suave: #5f6f6b;
+  --borde: #d6dcda;
+  --error: #b3261e;
+
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  color: var(--texto);
+}
+
+.ventas__titulo {
+  margin: 0 0 16px;
+  font-size: 1.75rem;
+  color: var(--verde);
+}
+
+.ventas__aviso {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  background: #dff3ee;
+  border-left: 4px solid var(--verde);
+  border-radius: 4px;
+}
+
+/* ---------- Layout de dos columnas ---------- */
+.ventas__layout {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.ventas__productos,
+.ventas__carrito {
+  background: var(--papel);
   border: 1px solid var(--borde);
   border-radius: 10px;
-  background: #fff;
-  color: #1f2a26;
-  font: inherit;
+  padding: 18px;
 }
 
-.formulario textarea { resize: vertical; }
-
-.formulario select:focus-visible,
-.formulario textarea:focus-visible,
-.fila-detalle select:focus-visible,
-.fila-detalle input:focus-visible {
-  outline: 3px solid var(--acento);
-  outline-offset: 2px;
+.ventas__carrito {
+  position: sticky;
+  top: 16px;
 }
 
-/* Panel de productos de la venta */
-.detalles { margin-top: 1.25rem; }
-.detalles h2 { margin: 0 0 1rem; font-size: 1.25rem; }
+.ventas h3 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
 
-.fila-detalle {
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.vacio {
+  color: var(--suave);
+  margin: 8px 0 16px;
+}
+
+/* ---------- Productos (izquierda) ---------- */
+.producto {
+  display: grid;
+  grid-template-columns: 1fr 72px auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.producto:last-child {
+  border-bottom: none;
+}
+
+.producto__info {
   display: flex;
-  align-items: flex-end;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.fila-detalle label {
-  display: block;
-  margin-bottom: 0.35rem;
+.producto__info span {
+  color: var(--suave);
+  font-size: 0.9rem;
+}
+
+.producto__cantidad {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  font: inherit;
+  text-align: center;
+}
+
+/* ---------- Selección (derecha) ---------- */
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.item__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item__info span {
+  color: var(--suave);
+  font-size: 0.9rem;
+}
+
+.item__subtotal {
   font-weight: 600;
-  font-size: 0.95rem;
 }
 
-.campo-producto { flex: 1 1 260px; }
-.campo-cantidad { flex: 0 0 110px; }
+.carrito__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 16px 0 12px;
+  font-size: 1.15rem;
+}
 
-.total {
-  margin: 1rem 0 0;
-  text-align: right;
-  font-size: 1.3rem;
+/* ---------- Botones ---------- */
+.btn {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 8px 14px;
+  transition: background-color 0.15s;
+}
+
+.btn:focus-visible,
+.producto__cantidad:focus-visible,
+.modal input:focus-visible,
+.modal select:focus-visible {
+  outline: 3px solid #7cc9b9;
+  outline-offset: 1px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--agregar,
+.btn--comprar,
+.btn--confirmar {
+  background: var(--verde);
+  color: #fff;
+}
+
+.btn--agregar:hover:not(:disabled),
+.btn--comprar:hover:not(:disabled),
+.btn--confirmar:hover:not(:disabled) {
+  background: var(--verde-oscuro);
+}
+
+.btn--comprar {
+  width: 100%;
+  padding: 12px;
+  font-weight: 600;
+}
+
+.btn--quitar {
+  background: transparent;
+  color: var(--suave);
+  padding: 4px 8px;
+}
+
+.btn--quitar:hover {
+  color: var(--error);
+}
+
+.btn--cancelar {
+  background: transparent;
+  border-color: var(--borde);
+  color: var(--texto);
+}
+
+/* ---------- Ventana de pago ---------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  z-index: 50;
+}
+
+.modal__caja {
+  width: 100%;
+  max-width: 420px;
+  background: var(--papel);
+  border-radius: 12px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.modal__caja h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+  color: var(--suave);
+}
+
+.modal input,
+.modal select {
+  padding: 9px 10px;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  font: inherit;
+  color: var(--texto);
+  background: #fff;
+}
+
+.modal__total {
+  margin: 0;
+}
+
+.modal__error {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.9rem;
+}
+
+.modal__acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* ---------- Celular ---------- */
+@media (max-width: 760px) {
+  .ventas__layout {
+    grid-template-columns: 1fr;
+  }
+  .ventas__carrito {
+    position: static;
+  }
 }

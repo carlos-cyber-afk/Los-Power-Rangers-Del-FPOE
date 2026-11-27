@@ -2,11 +2,13 @@ import { useState } from 'react'
 import './App.css'
 import Productos from './Productos'
 import Ventas from './Ventas'
+import Historial from './Historial'
 
 const enlaces = [
   { texto: 'Inicio', vista: 'inicio' },
   { texto: 'Productos', vista: 'productos' },
   { texto: 'Ventas', vista: 'ventas' },
+  { texto: 'Historial', vista: 'historial' },
 ]
 
 // Dibujo de línea reutilizable para los íconos
@@ -38,7 +40,7 @@ const pin = (
 )
 
 function App() {
-  // Qué pantalla se muestra: 'inicio', 'productos' o 'ventas'
+  // Qué pantalla se muestra: 'inicio', 'productos', 'ventas' o 'historial'
   const [vista, setVista] = useState('inicio')
 
   function ir(e, destino) {
@@ -67,6 +69,7 @@ function App() {
 
       {vista === 'productos' && <Productos />}
       {vista === 'ventas' && <Ventas />}
+      {vista === 'historial' && <Historial />}
 
       {vista === 'inicio' && (
         <>
